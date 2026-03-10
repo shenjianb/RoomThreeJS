@@ -1,6 +1,6 @@
 import React, { useMemo, useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, RoundedBox, Text } from '@react-three/drei';
+import { OrbitControls, RoundedBox } from '@react-three/drei';
 import * as THREE from 'three';
 
 function Lamp({ position = [0, 2.1, 0] }) {
@@ -8,7 +8,7 @@ function Lamp({ position = [0, 2.1, 0] }) {
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
     const pulse = 0.92 + Math.sin(t * 1.4) * 0.08;
-    bulb.current.material.emissiveIntensity = pulse;
+    if (bulb.current) bulb.current.material.emissiveIntensity = pulse;
   });
 
   return (
@@ -33,7 +33,7 @@ function Lamp({ position = [0, 2.1, 0] }) {
 function Plant({ position }) {
   const leaves = useRef();
   useFrame(({ clock }) => {
-    leaves.current.rotation.z = Math.sin(clock.elapsedTime * 0.7) * 0.05;
+    if (leaves.current) leaves.current.rotation.z = Math.sin(clock.elapsedTime * 0.7) * 0.05;
   });
 
   return (
@@ -84,7 +84,7 @@ function Window() {
 function Rug() {
   const rugRef = useRef();
   useFrame(({ clock }) => {
-    rugRef.current.material.emissiveIntensity = 0.08 + Math.sin(clock.elapsedTime * 0.9) * 0.03;
+    if (rugRef.current) rugRef.current.material.emissiveIntensity = 0.08 + Math.sin(clock.elapsedTime * 0.9) * 0.03;
   });
 
   return (
@@ -156,10 +156,6 @@ function Room() {
       <Plant position={[-2.05, 0.14, -0.5]} />
 
       <Lamp position={[-0.4, 2.25, -1.4]} />
-
-      <Text position={[0.86, 0.97, -0.72]} fontSize={0.14} color="#ecf2ff" anchorX="center" anchorY="middle">
-        cozy evening
-      </Text>
     </group>
   );
 }
@@ -168,6 +164,7 @@ function SteamPuff({ x, z, speed, offset }) {
   const puff = useRef();
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime() * speed + offset;
+    if (!puff.current) return;
     puff.current.position.y = 0.85 + (t % 1.8) * 0.23;
     puff.current.position.x = 1.55 + x + Math.sin(t * 2) * 0.04;
     puff.current.position.z = 0.55 + z + Math.cos(t * 1.6) * 0.03;
